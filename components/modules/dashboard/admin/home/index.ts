@@ -1,2 +1,1 @@
-// export admin dashboard home components
-export * from "./AdminDashboard"
+export { AdminDashboard } from './AdminDashboard'
