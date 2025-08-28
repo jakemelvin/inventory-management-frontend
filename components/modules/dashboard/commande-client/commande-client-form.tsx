@@ -276,7 +276,7 @@ export function CommandeClientForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[95vw] w-full lg:max-w-6xl xl:max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {mode === "create" ? "Nouvelle Commande Client" : "Modifier la Commande Client"}
@@ -291,7 +291,7 @@ export function CommandeClientForm({
         <div className="flex-1 overflow-y-auto">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="code"
@@ -312,7 +312,7 @@ export function CommandeClientForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Date de commande</FormLabel>
-                    <Popover>
+                    <Popover modal={true}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
@@ -331,7 +331,7 @@ export function CommandeClientForm({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="start" side="bottom" sideOffset={4}>
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -339,6 +339,7 @@ export function CommandeClientForm({
                           disabled={(date: Date) =>
                             date < new Date("1900-01-01")
                           }
+                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -359,10 +360,10 @@ export function CommandeClientForm({
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4 max-h-80 overflow-y-auto">
+              <CardContent className="space-y-4 max-h-96 overflow-y-auto">
                 {lignes.map((ligne, index) => (
-                  <div key={`ligne-${index}-${ligne.articleId || 'new'}`} className="flex items-center gap-4 p-4 border rounded-lg">
-                    <div className="flex-1">
+                  <div key={`ligne-${index}-${ligne.articleId || 'new'}`} className="grid grid-cols-12 items-center gap-4 p-4 border rounded-lg">
+                    <div className="col-span-5">
                       <Select
                         value={ligne.articleId.toString()}
                         onValueChange={(value) => updateLigne(index, "articleId", parseInt(value))}
@@ -382,17 +383,17 @@ export function CommandeClientForm({
                       </Select>
                     </div>
                     
-                    <div className="w-24">
+                    <div className="col-span-2">
                       <Input
                         type="number"
-                        placeholder="Qté"
+                        placeholder="Quantité"
                         value={ligne.quantite}
                         onChange={(e) => updateLigne(index, "quantite", parseInt(e.target.value) || 0)}
                         min="1"
                       />
                     </div>
                     
-                    <div className="w-32">
+                    <div className="col-span-2">
                       <Input
                         type="number"
                         placeholder="Prix unitaire"
@@ -403,21 +404,24 @@ export function CommandeClientForm({
                       />
                     </div>
                     
-                    <div className="w-32 text-right font-medium">
+                    <div className="col-span-2 text-right font-medium">
                       {new Intl.NumberFormat('fr-FR', {
                         style: 'currency',
                         currency: 'EUR'
                       }).format(ligne.quantite * ligne.prixUnitaire)}
                     </div>
                     
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeLigne(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="col-span-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeLigne(index)}
+                        className="w-full"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
                 
