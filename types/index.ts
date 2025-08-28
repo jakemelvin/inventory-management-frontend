@@ -27,3 +27,4 @@ export interface ApiError {
 // export types
 
 export * from "./user"
+export * from "./enterprise"
