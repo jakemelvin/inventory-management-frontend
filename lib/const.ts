@@ -11,3 +11,13 @@ export const EnterpriseMutationKeys = Object.freeze({
     Update: 'update-enterprise', 
     Delete: 'delete-enterprise'
 })
+
+export const ArticlesCacheKeys = Object.freeze({
+    Articles: 'articles'
+})
+
+export const ArticleMutationKeys = Object.freeze({
+    Create: 'create-article',
+    Update: 'update-article',
+    Delete: 'delete-article'
+})
