@@ -29,3 +29,4 @@ export interface ApiError {
 export * from "./user"
 export * from "./enterprise"
 export * from "./article"
+export * from "./commande-client"

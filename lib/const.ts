@@ -21,3 +21,16 @@ export const ArticleMutationKeys = Object.freeze({
     Update: 'update-article',
     Delete: 'delete-article'
 })
+
+export const CommandeClientsCacheKeys = Object.freeze({
+    CommandesClients: 'commandes-clients'
+})
+
+export const CommandeClientMutationKeys = Object.freeze({
+    Create: 'create-commande-client',
+    Update: 'update-commande-client',
+    Delete: 'delete-commande-client',
+    AddLigne: 'add-ligne-commande-client',
+    UpdateLigne: 'update-ligne-commande-client',
+    RemoveLigne: 'remove-ligne-commande-client'
+})
