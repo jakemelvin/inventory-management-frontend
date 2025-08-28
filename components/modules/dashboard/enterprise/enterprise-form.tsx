@@ -54,7 +54,7 @@ export function EnterpriseForm({
   onOpenChange,
   enterprise,
   mode,
-}: EnterpriseFormProps) {
+}: Readonly<EnterpriseFormProps>) {
   const [photoFile, setPhotoFile] = useState<File | undefined>()
   const { createEnterprise, updateEnterprise } = useEnterprise({})
 

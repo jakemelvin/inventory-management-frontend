@@ -3,12 +3,13 @@ import { enterpriseServices } from "@/services/enterpriseServices"
 import { queryClient } from '@/providers';
 import { toast } from 'sonner';
 import { Enterprise, CreateEnterpriseRequest, UpdateEnterpriseRequest, ApiError } from '@/types';
-import { EnterprisesCacheKeys } from "@/lib/const"
+import { EnterprisesCacheKeys, EnterpriseMutationKeys } from "@/lib/const"
 
 export const useEnterprise = ({ enterpriseId }: {
     enterpriseId?: Enterprise['id']
 }) => {
     const createEnterprise = useMutation({
+        mutationKey: [EnterpriseMutationKeys.Create],
         mutationFn: ({ data }: { data: CreateEnterpriseRequest }) =>
             enterpriseServices.create(data),
         onSuccess: () => {
@@ -27,6 +28,7 @@ export const useEnterprise = ({ enterpriseId }: {
     })
 
     const updateEnterprise = useMutation({
+        mutationKey: [EnterpriseMutationKeys.Update],
         mutationFn: ({ id, data }: { id: Enterprise['id'], data: UpdateEnterpriseRequest }) =>
             enterpriseServices.update(id, data),
         onSuccess: () => {
@@ -52,6 +54,7 @@ export const useEnterprise = ({ enterpriseId }: {
     })
 
     const deleteEnterprise = useMutation({
+        mutationKey: [EnterpriseMutationKeys.Delete],
         mutationFn: (enterpriseId: Enterprise['id']) => enterpriseServices.delete(enterpriseId),
         onSuccess: () => {
             queryClient.invalidateQueries({

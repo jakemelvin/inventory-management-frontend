@@ -1,9 +1,5 @@
-import { EnterpriseList } from "@/components/modules/enterprise"
+import { EnterpriseList } from "@/components/modules/dashboard/enterprise"
 
-export default function EntreprisesPage() {
-  return (
-    <div className="container mx-auto py-6">
-      <EnterpriseList />
-    </div>
-  )
+export default function AdminEnterprisesPage() {
+  return <EnterpriseList />;
 }

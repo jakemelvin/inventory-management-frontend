@@ -25,34 +25,38 @@ export function EnterpriseList() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center h-32">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-600">Chargement des entreprises...</p>
+      <div className="container mx-auto py-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center h-32">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                <p className="mt-2 text-sm text-gray-600">Chargement des entreprises...</p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-red-600">
-            <p>Erreur lors du chargement des entreprises</p>
-            <p className="text-sm mt-1">Veuillez réessayer plus tard</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="container mx-auto py-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center text-red-600">
+              <p>Erreur lors du chargement des entreprises</p>
+              <p className="text-sm mt-1">Veuillez réessayer plus tard</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <>
+    <div className="container mx-auto py-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -85,6 +89,6 @@ export function EnterpriseList() {
         enterprise={selectedEnterprise}
         mode="edit"
       />
-    </>
+    </div>
   )
 }
