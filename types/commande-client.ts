@@ -12,15 +12,15 @@ export interface CommandeClient {
 export interface CreateCommandeClientRequest {
   code: string
   dateCommande: string
-  entrepriseId?: number
-  clientId?: number
+  entrepriseId: number
+  clientId: number
 }
 
 export interface UpdateCommandeClientRequest {
   code: string
   dateCommande: string
-  entrepriseId?: number
-  clientId?: number
+  entrepriseId: number
+  clientId: number
 }
 
 export interface LigneCommandeClient {
@@ -33,18 +33,19 @@ export interface LigneCommandeClient {
 }
 
 export interface CreateLigneCommandeClientRequest {
+  commandeClientId: number
   articleId: number
   quantite: number
   prixUnitaire: number
-  entrepriseId?: number
+  entrepriseId: number
 }
 
 export interface UpdateLigneCommandeClientRequest {
-  id?: number
+  commandeClientId: number
   articleId: number
   quantite: number
   prixUnitaire: number
-  entrepriseId?: number
+  entrepriseId: number
 }
 
 export interface ClientResponseDto {

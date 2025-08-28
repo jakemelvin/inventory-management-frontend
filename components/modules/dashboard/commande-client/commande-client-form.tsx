@@ -46,11 +46,16 @@ import { useArticles } from "@/hooks/useArticles"
 import { CommandeClient, Article } from "@/types"
 
 const commandeClientSchema = z.object({
-  code: z.string().min(1, "Le code est obligatoire"),
+  code: z.string().min(1, "Le code est requis"),
   dateCommande: z.date({
-    required_error: "La date de commande est obligatoire",
+    required_error: "La date de commande est requise",
   }),
-  clientId: z.number().optional(),
+  clientId: z.number({
+    required_error: "Le client est requis",
+  }).min(1, "Le client est requis"),
+  entrepriseId: z.number({
+    required_error: "L'entreprise est requise",
+  }).min(1, "L'entreprise est requise"),
 })
 
 type CommandeClientFormData = z.infer<typeof commandeClientSchema>
@@ -72,11 +77,13 @@ export function CommandeClientForm({
   onOpenChange,
   commandeClient,
   mode,
-}: CommandeClientFormProps) {
+}: Readonly<CommandeClientFormProps>) {
   const [lignes, setLignes] = useState<(LigneFormData & { id?: number })[]>([])
   const [selectedArticles, setSelectedArticles] = useState<Article[]>([])
 
-  const { createCommandeClient, updateCommandeClient } = useCommandeClient({})
+  const { createCommandeClient, updateCommandeClient, addLigne: addLigneMutation, updateLigne: updateLigneMutation, removeLigne: removeLigneMutation } = useCommandeClient({
+    id: commandeClient?.id,
+  })
   const { getArticles } = useArticles()
   const { data: articles = [] } = getArticles
 
@@ -85,7 +92,8 @@ export function CommandeClientForm({
     defaultValues: {
       code: "",
       dateCommande: new Date(),
-      clientId: undefined,
+      clientId: 1,
+      entrepriseId: 1,
     },
   })
 
@@ -94,7 +102,8 @@ export function CommandeClientForm({
       form.reset({
         code: commandeClient.code,
         dateCommande: new Date(commandeClient.dateCommande),
-        clientId: undefined,
+        clientId: 1, // TODO: Get actual client ID from commandeClient
+        entrepriseId: commandeClient.entrepriseId || 1,
       })
       
       const commandeLignes = commandeClient.ligneCommandeClients?.map(ligne => ({
@@ -112,15 +121,23 @@ export function CommandeClientForm({
       form.reset({
         code: "",
         dateCommande: new Date(),
-        clientId: undefined,
+        clientId: 1,
+        entrepriseId: 1,
       })
       setLignes([])
       setSelectedArticles([])
     }
   }, [commandeClient, mode, form])
 
-  const addLigne = () => {
-    setLignes([...lignes, { articleId: 0, quantite: 1, prixUnitaire: 0 }])
+  const addLigneToForm = () => {
+    setLignes([
+      ...lignes,
+      {
+        articleId: 0,
+        quantite: 1,
+        prixUnitaire: 0,
+      },
+    ])
   }
 
   const removeLigne = (index: number) => {
@@ -160,24 +177,96 @@ export function CommandeClientForm({
         code: data.code,
         dateCommande: data.dateCommande.toISOString().split('T')[0],
         clientId: data.clientId,
+        entrepriseId: data.entrepriseId,
       }
 
+      let savedCommande
       if (mode === "create") {
-        await createCommandeClient.mutateAsync(commandeData)
+        savedCommande = await createCommandeClient.mutateAsync(commandeData)
+        
+        // Add new lignes for create mode
+        if (savedCommande && lignes.length > 0) {
+          for (const ligne of lignes) {
+            if (ligne.articleId && ligne.quantite > 0 && ligne.prixUnitaire >= 0) {
+              const ligneData = {
+                commandeClientId: savedCommande.id,
+                articleId: ligne.articleId,
+                quantite: ligne.quantite,
+                prixUnitaire: ligne.prixUnitaire,
+                entrepriseId: data.entrepriseId,
+              }
+              
+              await addLigneMutation.mutateAsync({
+                commandeId: savedCommande.id,
+                ligne: ligneData,
+              })
+            }
+          }
+        }
       } else if (commandeClient) {
-        await updateCommandeClient.mutateAsync({
+        // Update the commande
+        savedCommande = await updateCommandeClient.mutateAsync({
           id: commandeClient.id,
           data: commandeData,
         })
+
+        // Handle lignes for edit mode
+        if (savedCommande) {
+          const existingLignes = commandeClient.ligneCommandeClients || []
+          
+          // Process current lignes
+          for (const ligne of lignes) {
+            if (ligne.articleId && ligne.quantite > 0 && ligne.prixUnitaire >= 0) {
+              const ligneData = {
+                commandeClientId: savedCommande.id,
+                articleId: ligne.articleId,
+                quantite: ligne.quantite,
+                prixUnitaire: ligne.prixUnitaire,
+                entrepriseId: data.entrepriseId,
+              }
+
+              if (ligne.id) {
+                // Update existing ligne
+                await updateLigneMutation.mutateAsync({
+                  commandeId: savedCommande.id,
+                  ligneId: ligne.id,
+                  ligne: ligneData,
+                })
+              } else {
+                // Add new ligne
+                await addLigneMutation.mutateAsync({
+                  commandeId: savedCommande.id,
+                  ligne: ligneData,
+                })
+              }
+            }
+          }
+
+          // Remove lignes that were deleted (exist in original but not in current)
+          const currentLigneIds = lignes.filter(l => l.id).map(l => l.id)
+          const lignesToRemove = existingLignes.filter(
+            existing => !currentLigneIds.includes(existing.id)
+          )
+
+          for (const ligneToRemove of lignesToRemove) {
+            await removeLigneMutation.mutateAsync({
+              commandeId: savedCommande.id,
+              ligneId: ligneToRemove.id,
+            })
+          }
+        }
       }
 
       onOpenChange(false)
+      form.reset()
+      setLignes([])
+      setSelectedArticles([])
     } catch (error) {
       console.error("Erreur lors de la soumission:", error)
     }
   }
 
-  const isLoading = createCommandeClient.isPending || updateCommandeClient.isPending
+  const isLoading = createCommandeClient.isPending || updateCommandeClient.isPending || addLigneMutation.isPending || updateLigneMutation.isPending || removeLigneMutation.isPending
 
   const getTotalCommande = () => {
     return lignes.reduce((total, ligne) => {
@@ -187,21 +276,22 @@ export function CommandeClientForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {mode === "create" ? "Nouvelle Commande Client" : "Modifier la Commande Client"}
           </DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "Gérez les commandes clients de votre système d'inventaires de commande."
+              ? "Créez une nouvelle commande client avec ses lignes de commande."
               : "Modifiez les informations de la commande client."}
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex-1 overflow-y-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="code"
@@ -247,9 +337,8 @@ export function CommandeClientForm({
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date: Date) =>
-                            date < new Date() || date < new Date("1900-01-01")
+                            date < new Date("1900-01-01")
                           }
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -260,19 +349,19 @@ export function CommandeClientForm({
             </div>
 
             {/* Lignes de commande */}
-            <Card>
-              <CardHeader>
+            <Card className="flex-1 min-h-0">
+              <CardHeader className="flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <CardTitle>Lignes de commande</CardTitle>
-                  <Button type="button" onClick={addLigne} size="sm">
+                  <Button type="button" onClick={addLigneToForm} size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     Ajouter une ligne
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 max-h-80 overflow-y-auto">
                 {lignes.map((ligne, index) => (
-                  <div key={index} className="flex items-center gap-4 p-4 border rounded-lg">
+                  <div key={`ligne-${index}-${ligne.articleId || 'new'}`} className="flex items-center gap-4 p-4 border rounded-lg">
                     <div className="flex-1">
                       <Select
                         value={ligne.articleId.toString()}
@@ -283,13 +372,10 @@ export function CommandeClientForm({
                         </SelectTrigger>
                         <SelectContent>
                           {articles
-                            .filter(article => 
-                              !selectedArticles.some(selected => selected.id === article.id) ||
-                              article.id === ligne.articleId
-                            )
+                            .filter(article => !selectedArticles.some(selected => selected.id === article.id) || article.id === ligne.articleId)
                             .map((article) => (
                               <SelectItem key={article.id} value={article.id.toString()}>
-                                {article.designation} - {article.codeArticle}
+                                {article.designation} - {article.prixUnitaire?.toFixed(2)}€
                               </SelectItem>
                             ))}
                         </SelectContent>
@@ -336,8 +422,9 @@ export function CommandeClientForm({
                 ))}
                 
                 {lignes.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Aucune ligne de commande. Cliquez sur &quot;Ajouter une ligne&quot; pour commencer.
+                  <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                    <p className="font-medium">Aucune ligne de commande</p>
+                    <p className="text-sm mt-1">Ajoutez des articles à votre commande</p>
                   </div>
                 )}
                 
@@ -363,17 +450,15 @@ export function CommandeClientForm({
                 Annuler
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading
-                  ? mode === "create"
-                    ? "Création..."
-                    : "Mise à jour..."
-                  : mode === "create"
-                  ? "Créer"
-                  : "Mettre à jour"}
+                {isLoading && mode === "create" && "Création..."}
+                {isLoading && mode === "edit" && "Mise à jour..."}
+                {!isLoading && mode === "create" && "Créer"}
+                {!isLoading && mode === "edit" && "Mettre à jour"}
               </Button>
             </DialogFooter>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   )
