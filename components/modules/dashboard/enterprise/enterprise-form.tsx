@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -61,19 +61,51 @@ export function EnterpriseForm({
   const form = useForm<EnterpriseFormData>({
     resolver: zodResolver(enterpriseSchema),
     defaultValues: {
-      nomEntreprise: enterprise?.nomEntreprise || "",
-      description: enterprise?.description || "",
-      email: enterprise?.email || "",
-      adresse1: enterprise?.adresse?.adresse1 || "",
-      adresse2: enterprise?.adresse?.adresse2 || "",
-      ville: enterprise?.adresse?.ville || "",
-      codePostal: enterprise?.adresse?.codePostal || "",
-      pays: enterprise?.adresse?.pays || "",
-      codeFiscal: enterprise?.codeFiscal || "",
-      numTel: enterprise?.numTel || "",
-      steWeb: enterprise?.steWeb || "",
+      nomEntreprise: "",
+      description: "",
+      email: "",
+      adresse1: "",
+      adresse2: "",
+      ville: "",
+      codePostal: "",
+      pays: "",
+      codeFiscal: "",
+      numTel: "",
+      steWeb: "",
     },
   })
+
+  useEffect(() => {
+    if (enterprise && mode === "edit") {
+      form.reset({
+        nomEntreprise: enterprise.nomEntreprise || "",
+        description: enterprise.description || "",
+        email: enterprise.email || "",
+        adresse1: enterprise.adresse?.adresse1 || "",
+        adresse2: enterprise.adresse?.adresse2 || "",
+        ville: enterprise.adresse?.ville || "",
+        codePostal: enterprise.adresse?.codePostal || "",
+        pays: enterprise.adresse?.pays || "",
+        codeFiscal: enterprise.codeFiscal || "",
+        numTel: enterprise.numTel || "",
+        steWeb: enterprise.steWeb || "",
+      })
+    } else if (mode === "create") {
+      form.reset({
+        nomEntreprise: "",
+        description: "",
+        email: "",
+        adresse1: "",
+        adresse2: "",
+        ville: "",
+        codePostal: "",
+        pays: "",
+        codeFiscal: "",
+        numTel: "",
+        steWeb: "",
+      })
+    }
+  }, [enterprise, mode, form])
 
   const onSubmit = async (data: EnterpriseFormData) => {
     try {

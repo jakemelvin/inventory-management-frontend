@@ -12,8 +12,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
-export const columns: ColumnDef<Enterprise>[] = [
+interface ColumnsProps {
+  onEdit: (enterprise: Enterprise) => void
+  onDelete: (enterprise: Enterprise) => void
+}
+
+export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Enterprise>[] => [
   {
     accessorKey: "nomEntreprise",
     header: "Nom de l'entreprise",
@@ -86,14 +102,39 @@ export const columns: ColumnDef<Enterprise>[] = [
               Copier l&apos;ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(enterprise)}>
               <Edit className="mr-2 h-4 w-4" />
               Modifier
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Supprimer
-            </DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem 
+                  className="text-red-600"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Supprimer
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action ne peut pas être annulée. Cela supprimera définitivement 
+                    l&apos;entreprise &quot;{enterprise.nomEntreprise}&quot; de nos serveurs.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => onDelete(enterprise)}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       )

@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEnterprises } from "@/hooks/useEnterprises"
+import { useEnterprises, useEnterprise } from "@/hooks/useEnterprises"
 import { DataTable } from "./data-table"
-import { columns } from "./columns"
+import { createColumns } from "./columns"
 import { EnterpriseForm } from "./enterprise-form"
 import { Enterprise } from "@/types"
 
@@ -16,12 +16,27 @@ export function EnterpriseList() {
   const [selectedEnterprise, setSelectedEnterprise] = useState<Enterprise | undefined>()
 
   const { getEnterprises } = useEnterprises()
+  const { deleteEnterprise } = useEnterprise({})
   const { data: enterprises = [], isLoading, error } = getEnterprises
+
+  const handleEdit = (enterprise: Enterprise) => {
+    setSelectedEnterprise(enterprise)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleDelete = async (enterprise: Enterprise) => {
+    await deleteEnterprise.mutateAsync(enterprise.id)
+  }
 
   const handleCloseEditDialog = () => {
     setIsEditDialogOpen(false)
     setSelectedEnterprise(undefined)
   }
+
+  const columns = createColumns({
+    onEdit: handleEdit,
+    onDelete: handleDelete,
+  })
 
   if (isLoading) {
     return (
