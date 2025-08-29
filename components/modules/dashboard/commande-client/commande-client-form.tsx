@@ -199,7 +199,6 @@ export function CommandeClientForm({
       if (mode === "create") {
         savedCommande = await createCommandeClient.mutateAsync(commandeData)
         
-        // Add new lignes for create mode
         if (savedCommande && lignes.length > 0) {
           for (const ligne of lignes) {
             if (ligne.articleId && ligne.quantite > 0 && ligne.prixUnitaire >= 0) {
@@ -219,17 +218,14 @@ export function CommandeClientForm({
           }
         }
       } else if (commandeClient) {
-        // Update the commande
         savedCommande = await updateCommandeClient.mutateAsync({
           id: commandeClient.id,
           data: commandeData,
         })
 
-        // Handle lignes for edit mode
         if (savedCommande) {
           const existingLignes = commandeClient.ligneCommandeClients || []
           
-          // Process current lignes
           for (const ligne of lignes) {
             if (ligne.articleId && ligne.quantite > 0 && ligne.prixUnitaire >= 0) {
               const ligneData = {
@@ -241,14 +237,12 @@ export function CommandeClientForm({
               }
 
               if (ligne.id) {
-                // Update existing ligne
                 await updateLigneMutation.mutateAsync({
                   commandeId: savedCommande.id,
                   ligneId: ligne.id,
                   ligne: ligneData,
                 })
               } else {
-                // Add new ligne
                 await addLigneMutation.mutateAsync({
                   commandeId: savedCommande.id,
                   ligne: ligneData,
@@ -257,7 +251,6 @@ export function CommandeClientForm({
             }
           }
 
-          // Remove lignes that were deleted (exist in original but not in current)
           const currentLigneIds = lignes.filter(l => l.id).map(l => l.id)
           const lignesToRemove = existingLignes.filter(
             existing => !currentLigneIds.includes(existing.id)

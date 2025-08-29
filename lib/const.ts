@@ -50,3 +50,9 @@ export const ClientsCacheKeys = Object.freeze({
     Clients: 'clients',
     ClientsByEntreprise: 'clients-by-entreprise'
 })
+
+export const ClientMutationKeys = Object.freeze({
+    Create: 'create-client',
+    Update: 'update-client',
+    Delete: 'delete-client'
+})
