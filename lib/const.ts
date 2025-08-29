@@ -35,6 +35,15 @@ export const CommandeClientMutationKeys = Object.freeze({
     RemoveLigne: 'remove-ligne-commande-client'
 })
 
+export const CategoriesCacheKeys = Object.freeze({
+    Categories: 'categories'
+})
+
+export const CategorieMutationKeys = Object.freeze({
+    Create: 'create-categorie',
+    Update: 'update-categorie',
+    Delete: 'delete-categorie'
+})
 
 export const VentesCacheKeys = {
     Ventes: "ventes"
@@ -51,7 +60,6 @@ export const FournisseursCacheKeys = {
   Fournisseur: 'fournisseur'    
 }
 
-// Clés pour les mutations
 export const FournisseurMutationKeys = {
   Create: 'createFournisseur',
   Update: 'updateFournisseur',
