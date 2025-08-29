@@ -26,6 +26,12 @@ export const navigationConfig: NavigationItem[] = [
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
   {
+    title: "Catégories",
+    href: "/dashboard/categories",
+    icon: FolderOpen,
+    roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
+  },
+  {
     title: "Commandes Clients",
     href: "/dashboard/commandes-clients",
     icon: ShoppingCart,
