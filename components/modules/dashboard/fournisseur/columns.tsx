@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Fournisseur } from "@/types/fournisseur"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, Eye } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,9 +27,10 @@ import {
 interface ColumnsProps {
   onEdit: (fournisseur: Fournisseur) => void
   onDelete: (fournisseur: Fournisseur) => void
+  onDetail: (fournisseur: Fournisseur) => void
 }
 
-export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Fournisseur>[] => [
+export const createColumns = ({ onEdit, onDelete, onDetail }: ColumnsProps): ColumnDef<Fournisseur>[] => [
   {
     accessorKey: "nom",
     header: "Nom",
@@ -83,6 +84,10 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Fou
               Copier l&apos;ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onDetail(fournisseur)}>
+              <Eye className="mr-2 h-4 w-4" />
+              Voir détails
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(fournisseur)}>
               <Edit className="mr-2 h-4 w-4" />
               Modifier
