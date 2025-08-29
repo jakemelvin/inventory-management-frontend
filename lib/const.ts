@@ -34,3 +34,13 @@ export const CommandeClientMutationKeys = Object.freeze({
     UpdateLigne: 'update-ligne-commande-client',
     RemoveLigne: 'remove-ligne-commande-client'
 })
+
+export const VentesCacheKeys = {
+    Ventes: "ventes"
+}
+
+export const VenteMutationKeys = {
+    Create: "createVente",
+    Update: "updateVente",
+    Delete: "deleteVente"
+}
