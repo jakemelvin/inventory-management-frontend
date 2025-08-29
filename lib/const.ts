@@ -45,3 +45,8 @@ export const UtilisateurMutationKeys = Object.freeze({
     UPDATE_UTILISATEUR: 'update-utilisateur',
     DELETE_UTILISATEUR: 'delete-utilisateur'
 })
+
+export const ClientsCacheKeys = Object.freeze({
+    Clients: 'clients',
+    ClientsByEntreprise: 'clients-by-entreprise'
+})
