@@ -32,4 +32,5 @@ export * from "./article"
 export * from "./commande-client"
 export * from "./vente"
 export * from "./fournisseur"
+export * from "./role"
 
