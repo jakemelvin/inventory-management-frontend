@@ -51,7 +51,8 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Ven
     header: "Nb Articles",
     cell: ({ row }) => {
       const lignes = row.getValue("ligneVentes") as VentesResponseDto["ligneVentes"]
-      return <div>{lignes?.length || 0}</div>
+      const uniqueArticles = new Set(lignes?.map(ligne => ligne.article.id) || [])
+      return <div>{uniqueArticles.size}</div>
     },
   },
   {
