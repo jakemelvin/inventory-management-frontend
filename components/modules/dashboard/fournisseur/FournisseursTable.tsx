@@ -8,6 +8,7 @@ import { useFournisseurs, useFournisseur } from "@/hooks/useFournisseur"
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
 import { FournisseurForm } from "./fournisseur-form"
+import { FournisseurDetail } from "./fournisseur-detail"
 import { LoadingContent } from "@/components/global/loading-content"
 import { EmptyState } from "@/components/global/empty-state"
 import { Fournisseur } from "@/types/fournisseur"
@@ -15,6 +16,7 @@ import { Fournisseur } from "@/types/fournisseur"
 export function FournisseursTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedFournisseur, setSelectedFournisseur] = useState<Fournisseur | undefined>()
 
   const { getFournisseurs } = useFournisseurs()
@@ -26,6 +28,11 @@ export function FournisseursTable() {
     setIsEditDialogOpen(true)
   }
 
+  const handleDetail = (fournisseur: Fournisseur) => {
+    setSelectedFournisseur(fournisseur)
+    setIsDetailDialogOpen(true)
+  }
+
   const handleDelete = async (fournisseur: Fournisseur) => {
     await deleteFournisseur.mutateAsync(fournisseur.id)
   }
@@ -35,9 +42,15 @@ export function FournisseursTable() {
     setSelectedFournisseur(undefined)
   }
 
+  const handleCloseDetailDialog = () => {
+    setIsDetailDialogOpen(false)
+    setSelectedFournisseur(undefined)
+  }
+
   const columns = createColumns({
     onEdit: handleEdit,
     onDelete: handleDelete,
+    onDetail: handleDetail,
   })
 
   if (isLoading) {
@@ -110,6 +123,12 @@ export function FournisseursTable() {
         onOpenChange={handleCloseEditDialog}
         fournisseur={selectedFournisseur}
         mode="edit"
+      />
+
+      <FournisseurDetail
+        open={isDetailDialogOpen}
+        onOpenChange={handleCloseDetailDialog}
+        fournisseur={selectedFournisseur}
       />
     </div>
   )
