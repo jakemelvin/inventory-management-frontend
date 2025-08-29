@@ -9,6 +9,12 @@ declare module "next-auth" {
         email?: string | null;
         role?: string;
         accessToken?: string;
+        roles?: Array<{
+            id: number;
+            roleName: string;
+            utilisateurId: number;
+            entrepriseId: number;
+        }>;
     }
 
     interface Session {
@@ -23,6 +29,12 @@ declare module "next-auth/jwt" {
         id: string;
         role?: string;
         accessToken?: string;
+        roles?: Array<{
+            id: number;
+            roleName: string;
+            utilisateurId: number;
+            entrepriseId: number;
+        }>;
     }
 }
 

@@ -28,13 +28,19 @@ export const authOptions = {
                     }
 
                     const {token, user} = await res.json();
+                    
+                    const primaryRole = user.roles && user.roles.length > 0 
+                        ? user.roles[0].roleName 
+                        : null;
+                    
                     return {
                         id: user.id.toString(),
-                        firstName: user.firstName,
-                        lastName: user.lastName,
+                        firstName: user.nom,
+                        lastName: user.prenom,
                         email: user.email,
-                        role: (user.role as string)?.toUpperCase(),
+                        role: primaryRole?.toUpperCase(),
                         accessToken: token,
+                        roles: user.roles, // Store all roles for future use
                     };
                 } catch (error) {
                     console.error("Authorization error:", error);
@@ -49,6 +55,7 @@ export const authOptions = {
                 token.accessToken = user.accessToken;
                 token.role = user.role?.toUpperCase();
                 token.id = user.id;
+                token.roles = user.roles;
             }
             return token;
         },
@@ -56,6 +63,12 @@ export const authOptions = {
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = (token.role as string)?.toUpperCase();
+                session.user.roles = token.roles as Array<{
+                    id: number;
+                    roleName: string;
+                    utilisateurId: number;
+                    entrepriseId: number;
+                }> | undefined;
             }
             session.accessToken = token.accessToken as string;
             return session;
