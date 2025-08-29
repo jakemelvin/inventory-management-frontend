@@ -10,15 +10,12 @@ import { createColumns } from "./columns"
 import { VentesResponseDto } from "@/types/vente"
 
 export function VentesTable() {
-  const [selectedVente, setSelectedVente] = useState<VentesResponseDto | undefined>()
-
   const { getVentes } = useVentes()
   const { deleteVente } = useVente({})
   const { data: ventes = [], isLoading, error } = getVentes
 
   const handleEdit = (vente: VentesResponseDto) => {
-    setSelectedVente(vente)
-    // TODO: Open edit dialog
+    console.log('Edit vente:', vente.code)
   }
 
   const handleDelete = async (vente: VentesResponseDto) => {
