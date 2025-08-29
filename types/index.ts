@@ -30,4 +30,6 @@ export * from "./user"
 export * from "./enterprise"
 export * from "./article"
 export * from "./commande-client"
+export * from "./vente"
 export * from "./fournisseur"
+
