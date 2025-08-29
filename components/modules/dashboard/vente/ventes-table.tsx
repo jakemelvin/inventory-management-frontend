@@ -7,15 +7,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useVentes, useVente } from "@/hooks/useVente"
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
+import { VenteForm } from "./vente-form"
 import { VentesResponseDto } from "@/types/vente"
 
 export function VentesTable() {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [selectedVente, setSelectedVente] = useState<VentesResponseDto | undefined>()
+
   const { getVentes } = useVentes()
   const { deleteVente } = useVente({})
   const { data: ventes = [], isLoading, error } = getVentes
 
   const handleEdit = (vente: VentesResponseDto) => {
-    console.log('Edit vente:', vente.code)
+    setSelectedVente(vente)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false)
+    setSelectedVente(undefined)
   }
 
   const handleDelete = async (vente: VentesResponseDto) => {
@@ -70,7 +81,7 @@ export function VentesTable() {
                 Gérez les ventes de votre système d&apos;inventaire
               </CardDescription>
             </div>
-            <Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Nouvelle Vente
             </Button>
@@ -80,6 +91,19 @@ export function VentesTable() {
           <DataTable columns={columns} data={ventes} />
         </CardContent>
       </Card>
+
+      <VenteForm
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        mode="create"
+      />
+
+      <VenteForm
+        open={isEditDialogOpen}
+        onOpenChange={handleCloseEditDialog}
+        vente={selectedVente}
+        mode="edit"
+      />
     </div>
   )
 }

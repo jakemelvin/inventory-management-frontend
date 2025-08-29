@@ -48,11 +48,10 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Ven
   },
   {
     accessorKey: "ligneVentes",
-    header: "Nb Articles",
+    header: "Nb Lignes",
     cell: ({ row }) => {
       const lignes = row.getValue("ligneVentes") as VentesResponseDto["ligneVentes"]
-      const uniqueArticles = new Set(lignes?.map(ligne => ligne.article.id) || [])
-      return <div>{uniqueArticles.size}</div>
+      return <div>{lignes?.length || 0}</div>
     },
   },
   {
