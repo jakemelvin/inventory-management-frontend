@@ -2,11 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { clientServices } from "@/services/clientServices"
 import { ClientsCacheKeys } from "@/lib/const"
 
-export const useClients = (entrepriseId?: number) => {
+export const useClients = () => {
   const getClients = useQuery({
-    queryKey: [ClientsCacheKeys.Clients, entrepriseId],
-    queryFn: () => clientServices.getAll(entrepriseId),
-    enabled: !!entrepriseId
+    queryKey: [ClientsCacheKeys.Clients],
+    queryFn: () => clientServices.getAll()
   })
 
   return {

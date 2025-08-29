@@ -190,7 +190,7 @@ export function CommandeClientForm({
     try {
       const commandeData = {
         code: data.code,
-        dateCommande: data.dateCommande.toISOString().split('T')[0],
+        dateCommande: data.dateCommande.toISOString(),
         clientId: data.clientId,
         entrepriseId: data.entrepriseId,
       }
@@ -445,7 +445,7 @@ export function CommandeClientForm({
                         ) : (
                           clients.map((client) => (
                             <SelectItem key={client.id} value={client.id.toString()}>
-                              {client.prenom} {client.nom} - {client.mail}
+                              {client.prenom} {client.nom} - {client.email}
                             </SelectItem>
                           ))
                         )}
