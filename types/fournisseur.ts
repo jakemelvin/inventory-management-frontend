@@ -1,11 +1,4 @@
-export interface Adresse {
-    id: number | null
-    adresse1: string
-    adresse2: string | null
-    ville: string
-    codePostal: string
-    pays: string
-}
+import { Adresse } from "./enterprise"
 
 export interface EntrepriseResponseDto {
     id: number
@@ -35,19 +28,27 @@ export interface Fournisseur {
 export interface CreateFournisseurRequest {
     nom: string
     prenom: string
-    adresse: Adresse
     email: string
+    adresse1: string
+    adresse2?: string
+    ville: string
+    codePostal: string
+    pays: string
     numTel: string
     entrepriseId: number
-    photo?: string
+    photo?: File
 }
 
 export interface UpdateFournisseurRequest {
     nom: string
     prenom: string
-    adresse: Adresse
     email: string
+    adresse1: string
+    adresse2?: string
+    ville: string
+    codePostal: string
+    pays: string
     numTel: string
     entrepriseId: number
-    photo?: string
+    photo?: File
 }
