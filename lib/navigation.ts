@@ -1,5 +1,5 @@
 import { type UserRole, UserRoles } from "@/types"
-import { Settings, Building2, Package, ShoppingCart } from "lucide-react"
+import { Settings, Building2, Package, ShoppingCart, FolderOpen } from "lucide-react"
 
 export interface NavigationItem {
   title: string
@@ -20,6 +20,12 @@ export const navigationConfig: NavigationItem[] = [
     title: "Articles",
     href: "/dashboard/articles",
     icon: Package,
+    roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
+  },
+  {
+    title: "Catégories",
+    href: "/dashboard/categories",
+    icon: FolderOpen,
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
   {
