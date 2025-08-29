@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import {getEnv} from "@/lib/env";
 
 export const authOptions = {
-    secret: getEnv().authSecret || "development-secret-key-for-testing",
+    secret: getEnv().authSecret,
     session: {
         strategy: "jwt",
         maxAge: 24 * 60 * 60,
