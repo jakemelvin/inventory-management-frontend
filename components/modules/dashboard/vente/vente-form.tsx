@@ -21,10 +21,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { VentesRequestDto, VentesResponseDto } from "@/types/vente"
 import { useVente } from "@/hooks/useVente"
+import { useEnterprises } from "@/hooks/useEnterprises"
+import { useCommandesClients } from "@/hooks/useCommandesClients"
 
 const venteSchema = z.object({
   code: z.string().min(1, "Le code est requis"),
@@ -50,6 +59,10 @@ export function VenteForm({
   mode,
 }: Readonly<VenteFormProps>) {
   const { createVente, updateVente } = useVente({})
+  const { getEnterprises } = useEnterprises()
+  const { getCommandesClients } = useCommandesClients()
+  const { data: enterprises = [] } = getEnterprises
+  const { data: commandesClients = [] } = getCommandesClients
 
   const form = useForm<VenteFormData>({
     resolver: zodResolver(venteSchema),
@@ -86,6 +99,7 @@ export function VenteForm({
     try {
       const venteData: VentesRequestDto = {
         ...data,
+        dateVente: new Date(data.dateVente).toISOString(),
         ligneVentes: [],
       }
 
@@ -155,15 +169,24 @@ export function VenteForm({
                 name="entrepriseId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>ID Entreprise</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="1" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
+                    <FormLabel>Entreprise</FormLabel>
+                    <Select 
+                      onValueChange={(value) => field.onChange(Number(value))} 
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une entreprise" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {enterprises.map((enterprise) => (
+                          <SelectItem key={enterprise.id} value={enterprise.id.toString()}>
+                            {enterprise.nomEntreprise}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -173,15 +196,24 @@ export function VenteForm({
                 name="commandeId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>ID Commande</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="1" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
+                    <FormLabel>Commande Client</FormLabel>
+                    <Select 
+                      onValueChange={(value) => field.onChange(Number(value))} 
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une commande" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {commandesClients.map((commande) => (
+                          <SelectItem key={commande.id} value={commande.id.toString()}>
+                            {commande.code}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
