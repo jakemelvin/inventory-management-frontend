@@ -44,3 +44,24 @@ export const CategorieMutationKeys = Object.freeze({
     Update: 'update-categorie',
     Delete: 'delete-categorie'
 })
+
+export const VentesCacheKeys = {
+    Ventes: "ventes"
+}
+
+export const VenteMutationKeys = {
+    Create: "createVente",
+    Update: "updateVente",
+    Delete: "deleteVente"
+}
+
+export const FournisseursCacheKeys = {
+  Fournisseurs: 'fournisseurs', 
+  Fournisseur: 'fournisseur'    
+}
+
+export const FournisseurMutationKeys = {
+  Create: 'createFournisseur',
+  Update: 'updateFournisseur',
+  Delete: 'deleteFournisseur'
+}

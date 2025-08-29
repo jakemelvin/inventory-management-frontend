@@ -1,0 +1,5 @@
+export { FournisseursTable } from "./FournisseursTable"
+export { DataTable } from "./data-table"
+export { createColumns } from "./columns"
+export { FournisseurForm } from "./fournisseur-form"
+export { FournisseurDetail } from "./fournisseur-detail"
