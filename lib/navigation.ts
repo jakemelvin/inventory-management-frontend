@@ -1,5 +1,5 @@
 import { type UserRole, UserRoles } from "@/types"
-import { Settings, Building2, Package, ShoppingCart, Users, Home, UserCheck, Truck, TrendingUp, FolderOpen, BarChart3 } from "lucide-react"
+import { Building2, Package, ShoppingCart, Users, Home, UserCheck, Truck, TrendingUp, FolderOpen, BarChart3 } from "lucide-react"
 
 export interface NavigationItem {
   title: string
@@ -23,11 +23,18 @@ export const navigationConfig: NavigationItem[] = [
     roles: [UserRoles.ADMIN, UserRoles.MANAGER],
   },
   {
-    title: "Articles",
-    href: "/dashboard/articles",
-    icon: Package,
-    roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
+    title: "Utilisateurs",
+    href: "/dashboard/utilisateurs",
+    icon: Users,
+    roles: [UserRoles.ADMIN, UserRoles.MANAGER],
   },
+  {
+    title: "Rôles",
+    href: "/dashboard/roles",
+    icon: Users,
+    roles: [UserRoles.ADMIN],
+  },
+ 
   {
     title: "Catégories",
     href: "/dashboard/categories",
@@ -35,11 +42,12 @@ export const navigationConfig: NavigationItem[] = [
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
   {
-    title: "Commandes Clients",
-    href: "/dashboard/commandes-clients",
-    icon: ShoppingCart,
+    title: "Articles",
+    href: "/dashboard/articles",
+    icon: Package,
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
+
   {
     title: "Clients",
     href: "/dashboard/clients",
@@ -47,21 +55,9 @@ export const navigationConfig: NavigationItem[] = [
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
   {
-    title: "Commandes Fournisseurs",
-    href: "/dashboard/commandes-fournisseurs",
-    icon: Truck,
-    roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
-  },
-  {
-    title: "Utilisateurs",
-    href: "/dashboard/utilisateurs",
-    icon: Users,
-    roles: [UserRoles.ADMIN, UserRoles.MANAGER],
-  },
-  {
-    title: "Mouvements de Stock",
-    href: "/dashboard/mvt-stk",
-    icon: BarChart3,
+    title: "Commandes Clients",
+    href: "/dashboard/commandes-clients",
+    icon: ShoppingCart,
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
   {
@@ -77,17 +73,19 @@ export const navigationConfig: NavigationItem[] = [
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
   {
-    title: "Rôles",
-    href: "/dashboard/roles",
-    icon: Users,
-    roles: [UserRoles.ADMIN],
-  },
-  {
-    title: "Paramètres",
-    href: "/dashboard/settings",
-    icon: Settings,
+    title: "Commandes Fournisseurs",
+    href: "/dashboard/commandes-fournisseurs",
+    icon: Truck,
     roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
   },
+
+  {
+    title: "Mouvements de Stock",
+    href: "/dashboard/mvt-stk",
+    icon: BarChart3,
+    roles: [UserRoles.ADMIN, UserRoles.MANAGER, UserRoles.EMPLOYEE],
+  },
+ 
 ];
 
 export function getNavigationForRole(role: UserRole): NavigationItem[] {
