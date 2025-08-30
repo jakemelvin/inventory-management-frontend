@@ -42,4 +42,3 @@ export type {
 } from "./role"
 export * from "./utilisateur"
 export * from "./vente"
-
