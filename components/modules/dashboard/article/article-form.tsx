@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -157,17 +154,16 @@ export function ArticleForm({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight">
             {mode === "create" ? "Créer un article" : "Modifier l'article"}
-          </DialogTitle>
-          <DialogDescription>
+          </h2>
+          <p className="text-muted-foreground">
             {mode === "create" 
               ? "Remplissez les informations pour créer un nouvel article."
-              : "Modifiez les informations de l'article."
-            }
-          </DialogDescription>
-        </DialogHeader>
+              : "Modifiez les informations de l'article."}
+          </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -319,10 +315,11 @@ export function ArticleForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="image-input" className="block text-sm font-medium mb-2">
                 Image (optionnel)
               </label>
               <Input
+                id="image-input"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
@@ -341,12 +338,12 @@ export function ArticleForm({
                 type="submit" 
                 disabled={createArticle.isPending || updateArticle.isPending}
               >
-                {createArticle.isPending || updateArticle.isPending
-                  ? "En cours..."
-                  : mode === "create"
-                  ? "Créer"
-                  : "Modifier"
-                }
+                {(() => {
+                  if (createArticle.isPending || updateArticle.isPending) {
+                    return "En cours..."
+                  }
+                  return mode === "create" ? "Créer" : "Modifier"
+                })()}
               </Button>
             </DialogFooter>
           </form>

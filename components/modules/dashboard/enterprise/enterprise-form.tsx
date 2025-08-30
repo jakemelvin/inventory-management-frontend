@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -141,17 +138,16 @@ export function EnterpriseForm({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight">
             {mode === "create" ? "Créer une entreprise" : "Modifier l'entreprise"}
-          </DialogTitle>
-          <DialogDescription>
+          </h2>
+          <p className="text-muted-foreground">
             {mode === "create" 
               ? "Remplissez les informations pour créer une nouvelle entreprise."
-              : "Modifiez les informations de l'entreprise."
-            }
-          </DialogDescription>
-        </DialogHeader>
+              : "Modifiez les informations de l'entreprise."}
+          </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
