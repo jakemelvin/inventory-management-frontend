@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -29,9 +29,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { CreateArticleRequest, UpdateArticleRequest, Article } from "@/types"
+import { CreateArticleRequest, UpdateArticleRequest, Article, Categorie } from "@/types"
 import { useArticle } from "@/hooks/useArticles"
 import { useEnterprises } from "@/hooks/useEnterprises"
+import { useCategories } from "@/hooks/useCategories"
 
 const articleSchema = z.object({
   codeArticle: z.string().min(1, "Le code article est requis"),
@@ -61,7 +62,19 @@ export function ArticleForm({
   const [imageFile, setImageFile] = useState<File | undefined>()
   const { createArticle, updateArticle } = useArticle({})
   const { getEnterprises } = useEnterprises()
+  const { getCategories } = useCategories()
   const { data: enterprises = [] } = getEnterprises
+  const { data: categoriesData = [] } = getCategories
+  
+  // Combine categories with enterprise names
+  const categories = useMemo(() => {
+    if (!categoriesData || !getEnterprises.data) return []
+    
+    return categoriesData.map(categorie => ({
+      ...categorie,
+      entreprise: getEnterprises.data.find(enterprise => enterprise.id === categorie.entrepriseId)
+    }))
+  }, [categoriesData, getEnterprises.data])
 
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
@@ -131,7 +144,6 @@ export function ArticleForm({
     setImageFile(file)
   }
 
-  // Calculate TTC when price or TVA changes
   const watchPrixUnitaire = form.watch("prixUnitaire")
   const watchTauxTva = form.watch("tauxTva")
 
@@ -231,9 +243,11 @@ export function ArticleForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="1">Shoes</SelectItem>
-                        <SelectItem value="2">Electronics</SelectItem>
-                        <SelectItem value="3">Clothing</SelectItem>
+                        {categories.map((categorie: Categorie) => (
+                          <SelectItem key={categorie.id} value={categorie.id.toString()}>
+                            {categorie.designation} - {categorie.entreprise?.nomEntreprise}
+                          </SelectItem> 
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
