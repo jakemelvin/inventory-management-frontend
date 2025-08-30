@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRoles, useRole } from "@/hooks/useRoles"
 import { useEnterprises } from "@/hooks/useEnterprises"
-import { useUsers } from "@/hooks/useUsers"
+import { useUtilisateurs } from "@/hooks/useUtilisateurs"
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
 import { RoleForm } from "./role-form"
 import { LoadingContent } from "@/components/global/loading-content"
 import { EmptyState } from "@/components/global/empty-state"
-import { Role } from "@/types"
+import { Role } from "@/types/role"
+import { Utilisateur } from "@/types/utilisateur"
+import { Enterprise } from "@/types/enterprise"
 
 export function RolesTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -21,45 +23,42 @@ export function RolesTable() {
 
   const { getRoles } = useRoles()
   const { getEnterprises } = useEnterprises()
-  const { getUsers } = useUsers()
+  const { data: users } = useUtilisateurs()
   const { deleteRole } = useRole({})
   const { data: roles = [], isLoading, error } = getRoles
 
   const combinedData = useMemo(() => {
-    console.log('Raw roles:', roles)
-    console.log('Users data:', getUsers.data)
-    console.log('Enterprises data:', getEnterprises.data)
+  
     
     if (!roles || roles.length === 0) return []
     
     const combined = roles.map(role => {
-      const user = getUsers.data?.find(u => u.id === role.utilisateurId)
-      const enterprise = getEnterprises.data?.find(e => e.id === role.entrepriseId)
-      
-      console.log(`Role ${role.id}: looking for user ${role.utilisateurId}, found:`, user)
-      
+      const user = users?.find((u: Utilisateur) => u.id === (role as Role & { utilisateurId: number }).utilisateurId)
+      const enterprise = getEnterprises.data?.find((e: Enterprise) => e.id === (role as Role & { entrepriseId: number }).entrepriseId)
+            
       return {
         ...role,
         entreprise: enterprise,
-        utilisateur: user
+        utilisateur: user ? {
+          id: user.id,
+          firstName: user.prenom,
+          lastName: user.nom,
+          email: user.email
+        } : undefined
       }
     })
     
     console.log('Final combined data:', combined)
     return combined
-  }, [roles, getEnterprises.data, getUsers.data])
+  }, [roles, getEnterprises.data, users])
 
   const handleEdit = (role: Role) => {
     setSelectedRole(role)
     setIsEditDialogOpen(true)
   }
 
-  const handleDelete = async (role: Role) => {
-    try {
-      await deleteRole.mutateAsync(role.id)
-    } catch (error) {
-      console.error('Delete error:', error)
-    }
+  const handleDelete = (role: Role) => {
+    deleteRole.mutate(role.id)
   }
 
   const handleCloseEditDialog = () => {
@@ -124,7 +123,7 @@ export function RolesTable() {
               }}
             />
           ) : (
-            <DataTable columns={columns} data={combinedData} />
+            <DataTable columns={columns} data={combinedData as Role[]} />
           )}
         </CardContent>
       </Card>
