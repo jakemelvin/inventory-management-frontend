@@ -43,6 +43,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCommandeClient } from "@/hooks/useCommandesClients"
 import { useArticles } from "@/hooks/useArticles"
+import { useClientsByEntreprise } from "@/hooks/useClients"
+import { useEnterprises } from "@/hooks/useEnterprises"
 import { CommandeClient, Article } from "@/types"
 
 const commandeClientSchema = z.object({
@@ -80,30 +82,42 @@ export function CommandeClientForm({
 }: Readonly<CommandeClientFormProps>) {
   const [lignes, setLignes] = useState<(LigneFormData & { id?: number })[]>([])
   const [selectedArticles, setSelectedArticles] = useState<Article[]>([])
+  const [selectedEntrepriseId, setSelectedEntrepriseId] = useState<number | undefined>()
 
   const { createCommandeClient, updateCommandeClient, addLigne: addLigneMutation, updateLigne: updateLigneMutation, removeLigne: removeLigneMutation } = useCommandeClient({
     id: commandeClient?.id,
   })
   const { getArticles } = useArticles()
   const { data: articles = [] } = getArticles
+  
+  const { getEnterprises } = useEnterprises()
+  const { data: enterprises = [], isLoading: isLoadingEnterprises, error: enterprisesError } = getEnterprises
+  
+  const { getClientsByEntreprise } = useClientsByEntreprise(selectedEntrepriseId)
+  const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = getClientsByEntreprise
 
   const form = useForm<CommandeClientFormData>({
     resolver: zodResolver(commandeClientSchema),
     defaultValues: {
       code: "",
       dateCommande: new Date(),
-      clientId: 1,
-      entrepriseId: 1,
+      clientId: 0,
+      entrepriseId: 0,
     },
   })
 
   useEffect(() => {
     if (commandeClient && mode === "edit") {
+      const entrepriseId = commandeClient.entrepriseId
+      const clientId = commandeClient.client?.id
+      
+      setSelectedEntrepriseId(entrepriseId)
+      
       form.reset({
         code: commandeClient.code,
         dateCommande: new Date(commandeClient.dateCommande),
-        clientId: 1, // TODO: Get actual client ID from commandeClient
-        entrepriseId: commandeClient.entrepriseId || 1,
+        clientId: clientId || 0,
+        entrepriseId: entrepriseId,
       })
       
       const commandeLignes = commandeClient.ligneCommandeClients?.map(ligne => ({
@@ -121,11 +135,12 @@ export function CommandeClientForm({
       form.reset({
         code: "",
         dateCommande: new Date(),
-        clientId: 1,
-        entrepriseId: 1,
+        clientId: 0,
+        entrepriseId: 0,
       })
       setLignes([])
       setSelectedArticles([])
+      setSelectedEntrepriseId(undefined)
     }
   }, [commandeClient, mode, form])
 
@@ -175,7 +190,7 @@ export function CommandeClientForm({
     try {
       const commandeData = {
         code: data.code,
-        dateCommande: data.dateCommande.toISOString().split('T')[0],
+        dateCommande: data.dateCommande.toISOString(),
         clientId: data.clientId,
         entrepriseId: data.entrepriseId,
       }
@@ -184,7 +199,6 @@ export function CommandeClientForm({
       if (mode === "create") {
         savedCommande = await createCommandeClient.mutateAsync(commandeData)
         
-        // Add new lignes for create mode
         if (savedCommande && lignes.length > 0) {
           for (const ligne of lignes) {
             if (ligne.articleId && ligne.quantite > 0 && ligne.prixUnitaire >= 0) {
@@ -204,17 +218,14 @@ export function CommandeClientForm({
           }
         }
       } else if (commandeClient) {
-        // Update the commande
         savedCommande = await updateCommandeClient.mutateAsync({
           id: commandeClient.id,
           data: commandeData,
         })
 
-        // Handle lignes for edit mode
         if (savedCommande) {
           const existingLignes = commandeClient.ligneCommandeClients || []
           
-          // Process current lignes
           for (const ligne of lignes) {
             if (ligne.articleId && ligne.quantite > 0 && ligne.prixUnitaire >= 0) {
               const ligneData = {
@@ -226,14 +237,12 @@ export function CommandeClientForm({
               }
 
               if (ligne.id) {
-                // Update existing ligne
                 await updateLigneMutation.mutateAsync({
                   commandeId: savedCommande.id,
                   ligneId: ligne.id,
                   ligne: ligneData,
                 })
               } else {
-                // Add new ligne
                 await addLigneMutation.mutateAsync({
                   commandeId: savedCommande.id,
                   ligne: ligneData,
@@ -242,7 +251,6 @@ export function CommandeClientForm({
             }
           }
 
-          // Remove lignes that were deleted (exist in original but not in current)
           const currentLigneIds = lignes.filter(l => l.id).map(l => l.id)
           const lignesToRemove = existingLignes.filter(
             existing => !currentLigneIds.includes(existing.id)
@@ -339,7 +347,7 @@ export function CommandeClientForm({
                           disabled={(date: Date) =>
                             date < new Date("1900-01-01")
                           }
-                          initialFocus
+                          autoFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -347,7 +355,100 @@ export function CommandeClientForm({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="entrepriseId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Entreprise</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        const entrepriseId = parseInt(value)
+                        field.onChange(entrepriseId)
+                        setSelectedEntrepriseId(entrepriseId)
+                        // Reset client selection when enterprise changes
+                        form.setValue("clientId", 0)
+                        form.clearErrors("clientId")
+                      }}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une entreprise" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingEnterprises ? (
+                          <SelectItem value="loading" disabled>
+                            Chargement des entreprises...
+                          </SelectItem>
+                        ) : enterprisesError ? (
+                          <SelectItem value="error" disabled>
+                            Erreur de chargement
+                          </SelectItem>
+                        ) : enterprises.length === 0 ? (
+                          <SelectItem value="empty" disabled>
+                            Aucune entreprise disponible
+                          </SelectItem>
+                        ) : (
+                          enterprises.map((enterprise) => (
+                            <SelectItem key={enterprise.id} value={enterprise.id.toString()}>
+                              {enterprise.nomEntreprise}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
+            {selectedEntrepriseId && (
+              <FormField
+                control={form.control}
+                name="clientId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un client" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingClients ? (
+                          <SelectItem value="loading" disabled>
+                            Chargement des clients...
+                          </SelectItem>
+                        ) : clientsError ? (
+                          <SelectItem value="error" disabled>
+                            Erreur de chargement
+                          </SelectItem>
+                        ) : clients.length === 0 ? (
+                          <SelectItem value="empty" disabled>
+                            Aucun client disponible pour cette entreprise
+                          </SelectItem>
+                        ) : (
+                          clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id.toString()}>
+                              {client.prenom} {client.nom} - {client.email}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* Lignes de commande */}
             <Card className="flex-1 min-h-0">

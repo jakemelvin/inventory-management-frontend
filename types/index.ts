@@ -26,6 +26,12 @@ export interface ApiError {
 
 // export types
 
+export * from "./user"
+export * from "./article"
+export * from "./enterprise"
+export * from "./commande-client"
+export * from "./utilisateur"
+export * from "./client"
 export * from "./article"
 export * from "./categorie"
 export * from "./commande-client"
