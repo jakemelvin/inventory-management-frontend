@@ -86,6 +86,12 @@ export const CategoriesCacheKeys = Object.freeze({
     Categories: 'categories'
 })
 
+export const CategorieMutationKeys = Object.freeze({
+    Create: 'create-categorie',
+    Update: 'update-categorie',
+    Delete: 'delete-categorie'
+})
+
 export const VentesCacheKeys = {
     Ventes: "ventes"
 }

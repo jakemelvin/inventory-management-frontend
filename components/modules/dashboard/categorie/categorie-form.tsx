@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -23,12 +30,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useCategorie } from "@/hooks/useCategories"
+import { useEnterprises } from "@/hooks/useEnterprises"
 import { Categorie, CreateCategorieRequest, UpdateCategorieRequest } from "@/types"
-import { useUserStore } from "@/stores/userStore"
 
 const categorieSchema = z.object({
   code: z.string().min(1, "Le code est requis"),
   designation: z.string().min(1, "La désignation est requise"),
+  entrepriseId: z.coerce.number().min(1, "L'entreprise est requise"),
 })
 
 type CategorieFormData = z.infer<typeof categorieSchema>
@@ -41,8 +49,9 @@ interface CategorieFormProps {
 }
 
 export function CategorieForm({ open, onOpenChange, categorie, mode }: CategorieFormProps) {
-  const { user } = useUserStore()
   const { createCategorie, updateCategorie } = useCategorie({})
+  const { getEnterprises } = useEnterprises()
+  const { data: enterprises = [] } = getEnterprises
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CategorieFormData>({
@@ -50,6 +59,7 @@ export function CategorieForm({ open, onOpenChange, categorie, mode }: Categorie
     defaultValues: {
       code: "",
       designation: "",
+      entrepriseId: 0,
     },
   })
 
@@ -58,30 +68,32 @@ export function CategorieForm({ open, onOpenChange, categorie, mode }: Categorie
       form.reset({
         code: categorie.code,
         designation: categorie.designation,
+        entrepriseId: categorie.entrepriseId,
       })
     } else {
       form.reset({
         code: "",
         designation: "",
+        entrepriseId: 0,
       })
     }
   }, [categorie, mode, form])
 
   const onSubmit = async (data: CategorieFormData) => {
-    if (!user?.id) return
-
     setIsSubmitting(true)
     try {
       if (mode === "create") {
         const createData: CreateCategorieRequest = {
-          ...data,
-          entrepriseId: user.id, // Assuming user.id is the enterprise ID
+          code: data.code,
+          designation: data.designation,
+          entrepriseId: data.entrepriseId,
         }
         await createCategorie.mutateAsync({ data: createData })
       } else if (categorie) {
         const updateData: UpdateCategorieRequest = {
-          ...data,
-          entrepriseId: categorie.entrepriseId,
+          code: data.code,
+          designation: data.designation,
+          entrepriseId: data.entrepriseId,
         }
         await updateCategorie.mutateAsync({ id: categorie.id, data: updateData })
       }
@@ -134,6 +146,37 @@ export function CategorieForm({ open, onOpenChange, categorie, mode }: Categorie
                   <FormControl>
                     <Input placeholder="Ex: Électronique" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="entrepriseId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Entreprise</FormLabel>
+                  <Select 
+                    onValueChange={(value) => field.onChange(parseInt(value))} 
+                    value={field.value?.toString()}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez une entreprise" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {enterprises?.map((enterprise) => (
+                        <SelectItem 
+                          key={enterprise.id} 
+                          value={enterprise.id.toString()}
+                        >
+                          {enterprise.nomEntreprise}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
