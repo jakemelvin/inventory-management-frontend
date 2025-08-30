@@ -86,10 +86,6 @@ export const CategoriesCacheKeys = Object.freeze({
     Categories: 'categories'
 })
 
-export const CategoriesCacheKeys = Object.freeze({
-    Categories: 'categories'
-})
-
 export const VentesCacheKeys = {
     Ventes: "ventes"
 }

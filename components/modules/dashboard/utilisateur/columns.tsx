@@ -146,7 +146,7 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Uti
             </DropdownMenuItem>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:text-destructive/90">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Supprimer
                 </DropdownMenuItem>
@@ -160,7 +160,7 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Uti
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(utilisateur.id)}>
+                  <AlertDialogAction onClick={() => onDelete(utilisateur.id)} className="bg-destructive text-primary-foreground hover:bg-destructive/90">
                     Supprimer
                   </AlertDialogAction>
                 </AlertDialogFooter>
