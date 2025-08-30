@@ -1,12 +1,5 @@
 import { UseMutationResult } from "@tanstack/react-query"
-import type { ApiError } from "./index"
-
-export interface Categorie {
-    id: number
-    code: string
-    designation: string
-    entrepriseId: number
-}
+import type { ApiError, Categorie } from "./index"
 
 export interface Article {
     id: number
