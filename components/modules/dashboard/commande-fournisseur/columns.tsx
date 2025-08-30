@@ -19,9 +19,10 @@ import { fr } from "date-fns/locale"
 interface CommandeFournisseurColumnsProps {
   onEdit: (commandeFournisseur: CommandeFournisseur) => void
   onDelete: (commandeFournisseur: CommandeFournisseur) => void
+  onViewDetails: (commandeFournisseur: CommandeFournisseur) => void
 }
 
-export const createCommandeFournisseurColumns = ({ onEdit, onDelete }: CommandeFournisseurColumnsProps): ColumnDef<CommandeFournisseur>[] => [
+export const createCommandeFournisseurColumns = ({ onEdit, onDelete, onViewDetails }: CommandeFournisseurColumnsProps): ColumnDef<CommandeFournisseur>[] => [
   {
     accessorKey: "code",
     header: "Code",
@@ -103,6 +104,9 @@ export const createCommandeFournisseurColumns = ({ onEdit, onDelete }: CommandeF
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => onViewDetails(commandeFournisseur)}>
+              Voir les détails
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(commandeFournisseur.code)}
             >

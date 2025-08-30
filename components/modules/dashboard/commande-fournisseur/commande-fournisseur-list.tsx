@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useCommandesFournisseurs, useCommandeFournisseur } from "@/hooks/useCommandesFournisseurs"
 import { CommandeFournisseur } from "@/types"
 import { CommandeFournisseurForm } from "./commande-fournisseur-form"
+import { CommandeFournisseurDetailsDialog } from "./commande-fournisseur-details-dialog"
 import { DataTable } from "./data-table"
 import { createCommandeFournisseurColumns } from "./columns"
 
@@ -32,6 +33,7 @@ export function CommandeFournisseurList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
   const [selectedCommandeFournisseur, setSelectedCommandeFournisseur] = useState<CommandeFournisseur | null>(null)
 
   const { getCommandesFournisseurs } = useCommandesFournisseurs()
@@ -45,6 +47,11 @@ export function CommandeFournisseurList() {
   const handleDelete = (commandeFournisseur: CommandeFournisseur) => {
     setSelectedCommandeFournisseur(commandeFournisseur)
     setIsDeleteDialogOpen(true)
+  }
+
+  const handleViewDetails = (commandeFournisseur: CommandeFournisseur) => {
+    setSelectedCommandeFournisseur(commandeFournisseur)
+    setIsDetailsDialogOpen(true)
   }
 
   const handleConfirmDelete = async () => {
@@ -67,6 +74,7 @@ export function CommandeFournisseurList() {
   const columns = createCommandeFournisseurColumns({
     onEdit: handleEdit,
     onDelete: handleDelete,
+    onViewDetails: handleViewDetails,
   })
 
   if (getCommandesFournisseurs.isLoading) {
@@ -193,6 +201,13 @@ export function CommandeFournisseurList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Details Dialog */}
+      <CommandeFournisseurDetailsDialog
+        commandeFournisseur={selectedCommandeFournisseur}
+        open={isDetailsDialogOpen}
+        onOpenChange={setIsDetailsDialogOpen}
+      />
     </div>
   )
 }
