@@ -6,6 +6,12 @@ export type User = {
     firstName: string
     lastName: string
     role: string
+    roles?: Array<{
+        id: number
+        roleName: string
+        utilisateurId: number
+        entrepriseId: number
+    }>
 } | null
 
 export type UserStore = {

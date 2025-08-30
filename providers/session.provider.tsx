@@ -27,6 +27,7 @@ function UserProvider({ children }: Readonly<{ children: React.ReactNode }>) {
                 firstName: session.user.firstName ?? "",
                 lastName: session.user.lastName ?? "",
                 role: session.user.role ?? "",
+                roles: session.user.roles,
             })
         }
     }, [session, setUser])

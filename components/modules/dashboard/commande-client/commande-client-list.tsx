@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { useCommandesClients, useCommandeClient } from "@/hooks/useCommandesClients"
 import { DataTable } from "./data-table"
 import { createColumns } from "./columns"
@@ -72,22 +72,21 @@ export function CommandeClientList() {
 
   return (
     <div className="container mx-auto py-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Gestion des Commandes Clients</h1>
+          <p className="text-muted-foreground">
+            Gérez les commandes clients de votre système d&apos;inventaire
+          </p>
+        </div>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Nouvelle Commande
+        </Button>
+      </div>
+      
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Gestion des Commandes Clients</CardTitle>
-              <CardDescription>
-                Gérez les commandes clients de votre système d&apos;inventaire
-              </CardDescription>
-            </div>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nouvelle Commande
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <DataTable columns={columns} data={commandesClients} />
         </CardContent>
       </Card>

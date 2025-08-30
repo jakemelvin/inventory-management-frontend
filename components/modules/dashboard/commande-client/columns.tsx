@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { CommandeClient, LigneCommandeClient } from "@/types"
+import { CommandeClient } from "@/types"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 
@@ -49,7 +49,7 @@ const ActionsCell = ({ commandeClient, onEdit, onDelete }: { commandeClient: Com
         </DropdownMenuItem>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               Supprimer
             </DropdownMenuItem>
@@ -63,7 +63,10 @@ const ActionsCell = ({ commandeClient, onEdit, onDelete }: { commandeClient: Com
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction onClick={() => onDelete(commandeClient)}>
+              <AlertDialogAction 
+                onClick={() => onDelete(commandeClient)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
                 Supprimer
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -98,10 +101,10 @@ export const createColumns = ({ onEdit, onDelete }: ActionsProps): ColumnDef<Com
     accessorKey: "ligneCommandeClients",
     header: "Nb. Articles",
     cell: ({ row }) => {
-      const lignes = row.getValue("ligneCommandeClients") as LigneCommandeClient[]
+      const lignes = row.original.ligneCommandeClients || []
       return (
         <div className="text-center">
-          {lignes ? lignes.length : 0}
+          {lignes.length}
         </div>
       )
     },

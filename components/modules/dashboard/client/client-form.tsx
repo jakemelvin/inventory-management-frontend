@@ -372,7 +372,7 @@ export function ClientForm({ mode, client, onSuccess }: ClientFormProps) {
                         {(() => {
                           if (getEnterprises.isLoading) {
                             return (
-                              <SelectItem value="" disabled>
+                              <SelectItem value="loading" disabled>
                                 <div className="flex items-center">
                                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                   Chargement...
@@ -383,7 +383,7 @@ export function ClientForm({ mode, client, onSuccess }: ClientFormProps) {
                           
                           if (getEnterprises.error) {
                             return (
-                              <SelectItem value="" disabled>
+                              <SelectItem value="error" disabled>
                                 Erreur lors du chargement
                               </SelectItem>
                             )
@@ -391,7 +391,7 @@ export function ClientForm({ mode, client, onSuccess }: ClientFormProps) {
                           
                           if (enterprises.length === 0) {
                             return (
-                              <SelectItem value="" disabled>
+                              <SelectItem value="empty" disabled>
                                 Aucune entreprise disponible
                               </SelectItem>
                             )

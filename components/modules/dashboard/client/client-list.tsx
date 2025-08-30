@@ -20,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useClients, useClient } from "@/hooks/useClients"
 import { Client } from "@/types"
@@ -72,17 +72,15 @@ export function ClientList() {
   if (getClients.isLoading) {
     return (
       <div className="container mx-auto py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
         <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <Skeleton className="h-8 w-48 mb-2" />
-                <Skeleton className="h-4 w-96" />
-              </div>
-              <Skeleton className="h-10 w-32" />
-            </div>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={`skeleton-${i}`} className="flex items-center space-x-4">
@@ -104,13 +102,20 @@ export function ClientList() {
   if (getClients.error) {
     return (
       <div className="container mx-auto py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Gestion des Clients</h1>
+            <p className="text-muted-foreground">
+              Gérez vos clients et leurs informations
+            </p>
+          </div>
+        </div>
         <Card>
-          <CardHeader>
-            <CardTitle>Erreur</CardTitle>
-            <CardDescription>
-              Impossible de charger les clients. Veuillez réessayer.
-            </CardDescription>
-          </CardHeader>
+          <CardContent className="p-6">
+            <div className="text-center text-red-600">
+              <p>Une erreur est survenue lors du chargement des clients.</p>
+            </div>
+          </CardContent>
         </Card>
       </div>
     )
@@ -120,37 +125,36 @@ export function ClientList() {
 
   return (
     <div className="container mx-auto py-6">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Gestion des Clients</CardTitle>
-              <CardDescription>
-                Gérez vos clients et leurs informations
-              </CardDescription>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Gestion des Clients</h1>
+          <p className="text-muted-foreground">
+            Gérez vos clients et leurs informations
+          </p>
+        </div>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouveau Client
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Créer un nouveau client</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <ClientForm
+                mode="create"
+                onSuccess={handleCreateSuccess}
+              />
             </div>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nouveau Client
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Créer un nouveau client</DialogTitle>
-                </DialogHeader>
-                <div className="mt-4">
-                  <ClientForm
-                    mode="create"
-                    onSuccess={handleCreateSuccess}
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardHeader>
-        <CardContent>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      <Card>
+        <CardContent className="p-6">
           <DataTable columns={columns} data={clients} />
         </CardContent>
       </Card>
