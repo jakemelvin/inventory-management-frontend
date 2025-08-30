@@ -187,7 +187,7 @@ export function CommandeFournisseurForm({ mode, commandeFournisseur, onSuccess }
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Date de commande</FormLabel>
-                      <Popover>
+                      <Popover modal={false}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
