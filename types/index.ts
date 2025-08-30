@@ -28,17 +28,17 @@ export interface ApiError {
 
 export * from "./user"
 export * from "./article"
-export * from "./enterprise"
+export * from "./categorie"
+export * from "./client"
 export * from "./commande-client"
 export * from "./commande-fournisseur"
-export * from "./utilisateur"
-export * from "./client"
-export * from "./article"
-export * from "./categorie"
-export * from "./commande-client"
 export * from "./enterprise"
-export * from "./user"
-export * from "./vente"
 export * from "./fournisseur"
-export type { Role as SystemRole, CreateRoleRequest, UpdateRoleRequest } from "./role"
-
+export * from "./mvt-stk"
+export type { 
+  Role as RoleEntity, 
+  CreateRoleRequest, 
+  UpdateRoleRequest 
+} from "./role"
+export * from "./utilisateur"
+export * from "./vente"
