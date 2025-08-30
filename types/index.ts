@@ -28,16 +28,18 @@ export interface ApiError {
 
 export * from "./user"
 export * from "./article"
-export * from "./enterprise"
-export * from "./commande-client"
-export * from "./utilisateur"
-export * from "./client"
-export * from "./article"
 export * from "./categorie"
+export * from "./client"
 export * from "./commande-client"
+export * from "./commande-fournisseur"
 export * from "./enterprise"
-export * from "./user"
-export * from "./vente"
 export * from "./fournisseur"
-export * from "./role"
+export * from "./mvt-stk"
+export type { 
+  Role as RoleEntity, 
+  CreateRoleRequest, 
+  UpdateRoleRequest 
+} from "./role"
+export * from "./utilisateur"
+export * from "./vente"
 
