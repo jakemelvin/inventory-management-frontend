@@ -33,3 +33,5 @@ export * from "./enterprise"
 export * from "./user"
 export * from "./vente"
 export * from "./fournisseur"
+export * from "./role"
+
