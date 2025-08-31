@@ -12,7 +12,7 @@ export function HomeFooter() {
                             <Logo />
                         </div>
                         <p className="text-muted-foreground mb-4">
-                            StockPro, la solution de référence pour la gestion d'inventaire. Optimisez vos stocks et boostez votre productivité.
+                            StockMaster, la solution de référence pour la gestion d'inventaire. Optimisez vos stocks et boostez votre productivité.
                         </p>
                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                             <MapPin className="h-4 w-4" />
@@ -71,7 +71,7 @@ export function HomeFooter() {
                     </div>
                 </div>
                 <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-                    <p>&copy; {(new Date()).getFullYear()} StockPro. Made with ❤️ in Cameroon. Tous droits réservés.</p>
+                    <p>&copy; {(new Date()).getFullYear()} StockMaster. Made with ❤️ in Cameroon. Tous droits réservés.</p>
                 </div>
             </div>
         </footer>

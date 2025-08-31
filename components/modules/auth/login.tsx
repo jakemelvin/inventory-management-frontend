@@ -55,7 +55,7 @@ export function LoginForm() {
 
             if (result?.ok) {
                 toast.success("🎉 Connexion réussie!", {
-                    description: "Bienvenue sur StockPro!",
+                    description: "Bienvenue sur StockMaster!",
                 })
                 router.push("/dashboard")
             }
@@ -75,7 +75,7 @@ export function LoginForm() {
                 <Card className="shadow-lg  w-full md:max-w-md grid items-center">
                     <CardHeader className="space-y-1 text-center">
                         <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
-                        <CardDescription>Connectez-vous à votre compte StockPro</CardDescription>
+                        <CardDescription>Connectez-vous à votre compte StockMaster</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <Form {...form}>

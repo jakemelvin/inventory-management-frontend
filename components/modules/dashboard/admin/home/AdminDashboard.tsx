@@ -6,7 +6,7 @@ export function AdminDashboard() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold">Tableau de bord Administrateur</h1>
-                <p className="text-muted-foreground">Gérez votre système d'inventaire StockPro</p>
+                <p className="text-muted-foreground">Gérez votre système d'inventaire StockMaster</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
