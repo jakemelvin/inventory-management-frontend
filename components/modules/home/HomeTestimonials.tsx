@@ -9,7 +9,7 @@ export function HomeTestimonials() {
             role: "Responsable logistique",
             company: "TechStore SARL, Douala",
             content:
-                "StockPro a transformé notre gestion d'inventaire. Fini les ruptures de stock inattendues grâce aux alertes automatiques !",
+                "StockMaster a transformé notre gestion d'inventaire. Fini les ruptures de stock inattendues grâce aux alertes automatiques !",
             rating: 5,
         },
         {
@@ -17,7 +17,7 @@ export function HomeTestimonials() {
             role: "Gérant",
             company: "Electro Plus, Yaoundé",
             content:
-                "Avec StockPro, je suis mes ventes et mes commandes en temps réel. L'interface est intuitive et les rapports très détaillés !",
+                "Avec StockMaster, je suis mes ventes et mes commandes en temps réel. L'interface est intuitive et les rapports très détaillés !",
             rating: 5,
         },
         {
@@ -25,7 +25,7 @@ export function HomeTestimonials() {
             role: "Directrice commerciale",
             company: "Came Distribution, Bafoussam",
             content:
-                "La gestion multi-utilisateurs et la sécurité des données sont excellentes. Je recommande StockPro à toutes les entreprises !",
+                "La gestion multi-utilisateurs et la sécurité des données sont excellentes. Je recommande StockMaster à toutes les entreprises !",
             rating: 5,
         },
     ]

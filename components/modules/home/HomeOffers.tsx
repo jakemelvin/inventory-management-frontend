@@ -42,7 +42,7 @@ export function HomeOffers() {
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12 animate-fade-in">
                     <h2 className="text-3xl font-bold text-foreground mb-4">Fonctionnalités principales</h2>
-                    <p className="text-muted-foreground">Découvrez les atouts de StockPro pour votre entreprise</p>
+                    <p className="text-muted-foreground">Découvrez les atouts de StockMaster pour votre entreprise</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {features.map((feature, index) => (
@@ -60,7 +60,7 @@ export function HomeOffers() {
                 <div className="text-center mt-8">
                     <Link href="/dashboard">
                         <Button className="btn-animate">
-                            Découvrir StockPro
+                            Découvrir StockMaster
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </Link>

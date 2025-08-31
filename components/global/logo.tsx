@@ -8,7 +8,7 @@ export function Logo() {
                 <Package className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-primary">
-                StockPro
+                StockMaster
             </span>
         </Link>
     )

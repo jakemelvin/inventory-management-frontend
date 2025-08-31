@@ -8,7 +8,7 @@ export function HomeCta() {
             <div className="max-w-4xl mx-auto text-center animate-fade-in">
                 <h2 className="text-3xl font-bold mb-4">Prêt à optimiser votre gestion d'inventaire?</h2>
                 <p className="text-primary-foreground/80 mb-8 text-lg">
-                    Rejoignez des centaines d'entreprises qui ont amélioré leur productivité avec StockPro.
+                    Rejoignez des centaines d'entreprises qui ont amélioré leur productivité avec StockMaster.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link href="/dashboard">
