@@ -38,6 +38,7 @@ import { useEnterprises } from "@/hooks/useEnterprises"
 import { useFournisseurs } from "@/hooks/useFournisseur"
 import { useArticles } from "@/hooks/useArticles"
 import { CommandeFournisseur, CreateCommandeFournisseurRequest, UpdateCommandeFournisseurRequest, LigneCommandeFournisseur, Fournisseur } from "@/types"
+import { useUserStore } from "@/stores/userStore"
 
 const commandeFournisseurSchema = z.object({
   code: z.string().min(1, "Le code est requis"),
@@ -61,6 +62,8 @@ export function CommandeFournisseurForm({ mode, commandeFournisseur, onSuccess }
   const [selectedArticleId, setSelectedArticleId] = useState<number>(0)
   const [quantite, setQuantite] = useState<number>(1)
   const [prixUnitaire, setPrixUnitaire] = useState<number>(0)
+  
+  const user = useUserStore((state) => state.user)
 
   const { createCommandeFournisseur, updateCommandeFournisseur, addLigneCommande, removeLigneCommande } = useCommandeFournisseur({
     commandeFournisseurId: commandeFournisseur?.id
@@ -81,23 +84,32 @@ export function CommandeFournisseurForm({ mode, commandeFournisseur, onSuccess }
 
   useEffect(() => {
     if (mode === "create") {
+      // Auto-select user's enterprise for new commandes
+      const userEntrepriseId = user?.roles?.[0]?.entrepriseId || 0
+      
       form.reset({
         code: "",
         dateCommande: new Date(),
-        entrepriseId: 0,
+        entrepriseId: userEntrepriseId,
         fournisseurId: 0,
       })
+      
+      
       setLignesCommande([])
     } else if (mode === "edit" && commandeFournisseur) {
-      form.reset({
-        code: commandeFournisseur.code,
-        dateCommande: new Date(commandeFournisseur.dateCommande),
-        entrepriseId: commandeFournisseur.entrepriseId,
-        fournisseurId: commandeFournisseur.fournisseur.id,
-      })
+      // Use setTimeout to ensure fournisseurs are loaded before setting form values
+      setTimeout(() => {
+        form.reset({
+          code: commandeFournisseur.code,
+          dateCommande: new Date(commandeFournisseur.dateCommande),
+          entrepriseId: commandeFournisseur.entrepriseId,
+          fournisseurId: commandeFournisseur.fournisseur.id,
+        })
+      }, 100)
+      
       setLignesCommande(commandeFournisseur.ligneCommandeFournisseurs || [])
     }
-  }, [mode, commandeFournisseur, form])
+  }, [mode, commandeFournisseur, form, user?.roles])
 
   const onSubmit = async (values: CommandeFournisseurFormValues) => {
     try {
@@ -354,36 +366,76 @@ export function CommandeFournisseurForm({ mode, commandeFournisseur, onSuccess }
                   
                   {/* Add Article Form */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
-                    <Select
-                      onValueChange={(value) => setSelectedArticleId(parseInt(value))}
-                      value={selectedArticleId?.toString() || ""}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un article" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {articles.map((article) => (
-                          <SelectItem key={article.id} value={article.id.toString()}>
-                            {article.designation}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      type="number"
-                      placeholder="Quantité"
-                      value={quantite}
-                      onChange={(e) => setQuantite(parseInt(e.target.value) || 1)}
-                      min="1"
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Prix unitaire"
-                      value={prixUnitaire}
-                      onChange={(e) => setPrixUnitaire(parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.01"
-                    />
+                    <div>
+                      <label htmlFor="article-select" className="text-sm font-medium mb-1 block">Article</label>
+                      <Select
+                        onValueChange={(value) => setSelectedArticleId(parseInt(value))}
+                        value={selectedArticleId?.toString() || ""}
+                      >
+                        <SelectTrigger id="article-select">
+                          <SelectValue placeholder="Sélectionner un article" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(() => {
+                            if (getArticles.isLoading) {
+                              return (
+                                <SelectItem value="loading" disabled>
+                                  <div className="flex items-center">
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Chargement...
+                                  </div>
+                                </SelectItem>
+                              )
+                            }
+                            
+                            if (getArticles.error) {
+                              return (
+                                <SelectItem value="error" disabled>
+                                  Erreur lors du chargement
+                                </SelectItem>
+                              )
+                            }
+                            
+                            if (articles.length === 0) {
+                              return (
+                                <SelectItem value="empty" disabled>
+                                  Aucun article disponible
+                                </SelectItem>
+                              )
+                            }
+                            
+                            return articles.map((article) => (
+                              <SelectItem key={article.id} value={article.id.toString()}>
+                                {article.designation}
+                              </SelectItem>
+                            ))
+                          })()} 
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label htmlFor="quantite-input" className="text-sm font-medium mb-1 block">Quantité</label>
+                      <Input
+                        id="quantite-input"
+                        type="number"
+                        placeholder="Quantité"
+                        value={quantite}
+                        onChange={(e) => setQuantite(parseInt(e.target.value) || 1)}
+                        min="1"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="prix-input" className="text-sm font-medium mb-1 block">Prix unitaire</label>
+                      <Input
+                        id="prix-input"
+                        type="number"
+                        placeholder="Prix unitaire"
+                        value={prixUnitaire}
+                        onChange={(e) => setPrixUnitaire(parseFloat(e.target.value) || 0)}
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
                     <Button
                       type="button"
                       onClick={handleAddLigne}

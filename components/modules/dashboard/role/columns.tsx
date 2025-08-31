@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Role } from "@/types"
+import { Role } from "@/types/role"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import {

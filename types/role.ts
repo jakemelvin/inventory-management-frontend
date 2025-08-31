@@ -17,6 +17,12 @@ export interface Role {
     }
 }
 
+// Extended type for API responses that might have different structure
+export interface RoleWithIds extends Omit<Role, 'utilisateurId' | 'entrepriseId'> {
+    utilisateurId: number
+    entrepriseId: number
+}
+
 export interface CreateRoleRequest {
     roleName: string
     utilisateurId: number

@@ -29,9 +29,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Role } from "@/types"
+import { Role } from "@/types/role"
+import { Utilisateur } from "@/types/utilisateur"
 import { useRole } from "@/hooks/useRoles"
 import { useEnterprises } from "@/hooks/useEnterprises"
+import { useUtilisateurs } from "@/hooks/useUtilisateurs"
 import { SubmitButton } from "@/components/global/submit-button"
 
 const roleSchema = z.object({
@@ -58,6 +60,7 @@ export function RoleForm({
   const { createRole, updateRole } = useRole({})
   const { getEnterprises } = useEnterprises()
   const { data: enterprises = [] } = getEnterprises
+  const { data: users = [] } = useUtilisateurs()
 
   const form = useForm<RoleFormData>({
     resolver: zodResolver(roleSchema),
@@ -136,14 +139,27 @@ export function RoleForm({
               name="utilisateurId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ID Utilisateur</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      placeholder="Entrez l'ID de l'utilisateur" 
-                      {...field} 
-                    />
-                  </FormControl>
+                  <FormLabel>Utilisateur</FormLabel>
+                  <Select 
+                    onValueChange={(value) => field.onChange(parseInt(value))} 
+                    value={field.value?.toString()}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez un utilisateur" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {users?.map((user: Utilisateur) => (
+                        <SelectItem 
+                          key={user.id} 
+                          value={user.id.toString()}
+                        >
+                          {user.prenom} {user.nom} ({user.email})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

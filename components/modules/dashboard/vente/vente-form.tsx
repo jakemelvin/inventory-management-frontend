@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -121,17 +118,16 @@ export function VenteForm({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight">
             {mode === "create" ? "Créer une vente" : "Modifier la vente"}
-          </DialogTitle>
-          <DialogDescription>
+          </h2>
+          <p className="text-muted-foreground">
             {mode === "create" 
               ? "Remplissez les informations pour créer une nouvelle vente."
-              : "Modifiez les informations de la vente."
-            }
-          </DialogDescription>
-        </DialogHeader>
+              : "Modifiez les informations de la vente."}
+          </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -207,7 +203,7 @@ export function VenteForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {commandesClients.map((commande) => (
+                        {commandesClients.map((commande: { id: number; code: string }) => (
                           <SelectItem key={commande.id} value={commande.id.toString()}>
                             {commande.code}
                           </SelectItem>
@@ -249,12 +245,12 @@ export function VenteForm({
                 type="submit" 
                 disabled={createVente.isPending || updateVente.isPending}
               >
-                {createVente.isPending || updateVente.isPending
-                  ? "En cours..."
-                  : mode === "create"
-                  ? "Créer"
-                  : "Modifier"
-                }
+                {(() => {
+                  if (createVente.isPending || updateVente.isPending) {
+                    return "En cours..."
+                  }
+                  return mode === "create" ? "Créer" : "Modifier"
+                })()}
               </Button>
             </DialogFooter>
           </form>

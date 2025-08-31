@@ -45,6 +45,7 @@ import { useCommandeClient } from "@/hooks/useCommandesClients"
 import { useArticles } from "@/hooks/useArticles"
 import { useClientsByEntreprise } from "@/hooks/useClients"
 import { useEnterprises } from "@/hooks/useEnterprises"
+import { useUserStore } from "@/stores/userStore"
 import { CommandeClient, Article } from "@/types"
 
 const commandeClientSchema = z.object({
@@ -84,6 +85,8 @@ export function CommandeClientForm({
   const [selectedArticles, setSelectedArticles] = useState<Article[]>([])
   const [selectedEntrepriseId, setSelectedEntrepriseId] = useState<number | undefined>()
 
+  const user = useUserStore((state) => state.user)
+  
   const { createCommandeClient, updateCommandeClient, addLigne: addLigneMutation, updateLigne: updateLigneMutation, removeLigne: removeLigneMutation } = useCommandeClient({
     id: commandeClient?.id,
   })
@@ -111,14 +114,18 @@ export function CommandeClientForm({
       const entrepriseId = commandeClient.entrepriseId
       const clientId = commandeClient.client?.id
       
+      // Set enterprise first to load clients
       setSelectedEntrepriseId(entrepriseId)
       
-      form.reset({
-        code: commandeClient.code,
-        dateCommande: new Date(commandeClient.dateCommande),
-        clientId: clientId || 0,
-        entrepriseId: entrepriseId,
-      })
+      // Use setTimeout to ensure clients are loaded before setting form values
+      setTimeout(() => {
+        form.reset({
+          code: commandeClient.code,
+          dateCommande: new Date(commandeClient.dateCommande),
+          clientId: clientId || 0,
+          entrepriseId: entrepriseId,
+        })
+      }, 100)
       
       const commandeLignes = commandeClient.ligneCommandeClients?.map(ligne => ({
         id: ligne.id,
@@ -132,17 +139,24 @@ export function CommandeClientForm({
       const articlesInLignes = commandeClient.ligneCommandeClients?.map(ligne => ligne.article) || []
       setSelectedArticles(articlesInLignes)
     } else {
+      // Auto-select user's enterprise for new commandes
+      const userEntrepriseId = user?.roles?.[0]?.entrepriseId || 0
+      
       form.reset({
         code: "",
         dateCommande: new Date(),
         clientId: 0,
-        entrepriseId: 0,
+        entrepriseId: userEntrepriseId,
       })
+      
+      if (userEntrepriseId > 0) {
+        setSelectedEntrepriseId(userEntrepriseId)
+      }
+      
       setLignes([])
       setSelectedArticles([])
-      setSelectedEntrepriseId(undefined)
     }
-  }, [commandeClient, mode, form])
+  }, [commandeClient, mode, form, user?.roles])
 
   const addLigneToForm = () => {
     setLignes([
@@ -190,7 +204,7 @@ export function CommandeClientForm({
     try {
       const commandeData = {
         code: data.code,
-        dateCommande: data.dateCommande.toISOString(),
+        dateCommande: data.dateCommande.toISOString().split('T')[0],
         clientId: data.clientId,
         entrepriseId: data.entrepriseId,
       }
@@ -292,7 +306,7 @@ export function CommandeClientForm({
           <DialogDescription>
             {mode === "create"
               ? "Créez une nouvelle commande client avec ses lignes de commande."
-              : "Modifiez les informations de la commande client."}
+              : "Modifier la Commande Client\nModifiez les informations de la commande client."}
           </DialogDescription>
         </DialogHeader>
 
@@ -465,6 +479,7 @@ export function CommandeClientForm({
                 {lignes.map((ligne, index) => (
                   <div key={`ligne-${index}-${ligne.articleId || 'new'}`} className="grid grid-cols-12 items-center gap-4 p-4 border rounded-lg">
                     <div className="col-span-5">
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">Article</label>
                       <Select
                         value={ligne.articleId.toString()}
                         onValueChange={(value) => updateLigne(index, "articleId", parseInt(value))}
@@ -485,6 +500,7 @@ export function CommandeClientForm({
                     </div>
                     
                     <div className="col-span-2">
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">Quantité</label>
                       <Input
                         type="number"
                         placeholder="Quantité"
@@ -495,6 +511,7 @@ export function CommandeClientForm({
                     </div>
                     
                     <div className="col-span-2">
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">Prix unitaire (€)</label>
                       <Input
                         type="number"
                         placeholder="Prix unitaire"
@@ -505,11 +522,14 @@ export function CommandeClientForm({
                       />
                     </div>
                     
-                    <div className="col-span-2 text-right font-medium">
-                      {new Intl.NumberFormat('fr-FR', {
-                        style: 'currency',
-                        currency: 'EUR'
-                      }).format(ligne.quantite * ligne.prixUnitaire)}
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">Total</label>
+                      <div className="font-medium pt-2">
+                        {new Intl.NumberFormat('fr-FR', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        }).format(ligne.quantite * ligne.prixUnitaire)}
+                      </div>
                     </div>
                     
                     <div className="col-span-1">

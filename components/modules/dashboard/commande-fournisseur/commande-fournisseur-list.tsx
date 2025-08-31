@@ -20,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useCommandesFournisseurs, useCommandeFournisseur } from "@/hooks/useCommandesFournisseurs"
 import { CommandeFournisseur } from "@/types"
@@ -80,17 +80,15 @@ export function CommandeFournisseurList() {
   if (getCommandesFournisseurs.isLoading) {
     return (
       <div className="container mx-auto py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-10 w-48" />
+        </div>
         <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <Skeleton className="h-8 w-64 mb-2" />
-                <Skeleton className="h-4 w-96" />
-              </div>
-              <Skeleton className="h-10 w-48" />
-            </div>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center space-x-4">
@@ -111,13 +109,23 @@ export function CommandeFournisseurList() {
   if (getCommandesFournisseurs.error) {
     return (
       <div className="container mx-auto py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Gestion des Commandes Fournisseurs</h1>
+            <p className="text-muted-foreground">
+              Gérez vos commandes fournisseurs et leurs articles
+            </p>
+          </div>
+        </div>
         <Card>
-          <CardHeader>
-            <CardTitle>Erreur</CardTitle>
-            <CardDescription>
-              Impossible de charger les commandes fournisseurs. Veuillez réessayer.
-            </CardDescription>
-          </CardHeader>
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <h3 className="text-lg font-semibold text-red-600">Erreur</h3>
+              <p className="text-muted-foreground mt-2">
+                Impossible de charger les commandes fournisseurs. Veuillez réessayer.
+              </p>
+            </div>
+          </CardContent>
         </Card>
       </div>
     )
@@ -127,37 +135,35 @@ export function CommandeFournisseurList() {
 
   return (
     <div className="container mx-auto py-6">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Gestion des Commandes Fournisseurs</CardTitle>
-              <CardDescription>
-                Gérez vos commandes fournisseurs et leurs articles
-              </CardDescription>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Gestion des Commandes Fournisseurs</h1>
+          <p className="text-muted-foreground">
+            Gérez vos commandes fournisseurs et leurs articles
+          </p>
+        </div>
+        <Dialog modal={false} open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvelle Commande Fournisseur
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Créer une nouvelle commande fournisseur</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <CommandeFournisseurForm
+                mode="create"
+                onSuccess={handleCreateSuccess}
+              />
             </div>
-            <Dialog modal={false} open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nouvelle Commande Fournisseur
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Créer une nouvelle commande fournisseur</DialogTitle>
-                </DialogHeader>
-                <div className="mt-4">
-                  <CommandeFournisseurForm
-                    mode="create"
-                    onSuccess={handleCreateSuccess}
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardHeader>
-        <CardContent>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <Card>
+        <CardContent className="p-6">
           <DataTable columns={columns} data={commandesFournisseurs} />
         </CardContent>
       </Card>

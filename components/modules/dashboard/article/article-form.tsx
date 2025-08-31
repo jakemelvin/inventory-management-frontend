@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -29,9 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { CreateArticleRequest, UpdateArticleRequest, Article } from "@/types"
+import { CreateArticleRequest, UpdateArticleRequest, Article, Categorie } from "@/types"
 import { useArticle } from "@/hooks/useArticles"
 import { useEnterprises } from "@/hooks/useEnterprises"
+import { useCategories } from "@/hooks/useCategories"
 
 const articleSchema = z.object({
   codeArticle: z.string().min(1, "Le code article est requis"),
@@ -61,7 +59,19 @@ export function ArticleForm({
   const [imageFile, setImageFile] = useState<File | undefined>()
   const { createArticle, updateArticle } = useArticle({})
   const { getEnterprises } = useEnterprises()
+  const { getCategories } = useCategories()
   const { data: enterprises = [] } = getEnterprises
+  const { data: categoriesData = [] } = getCategories
+  
+  // Combine categories with enterprise names
+  const categories = useMemo(() => {
+    if (!categoriesData || !getEnterprises.data) return []
+    
+    return categoriesData.map(categorie => ({
+      ...categorie,
+      entreprise: getEnterprises.data.find(enterprise => enterprise.id === categorie.entrepriseId)
+    }))
+  }, [categoriesData, getEnterprises.data])
 
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
@@ -131,7 +141,6 @@ export function ArticleForm({
     setImageFile(file)
   }
 
-  // Calculate TTC when price or TVA changes
   const watchPrixUnitaire = form.watch("prixUnitaire")
   const watchTauxTva = form.watch("tauxTva")
 
@@ -145,17 +154,16 @@ export function ArticleForm({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight">
             {mode === "create" ? "Créer un article" : "Modifier l'article"}
-          </DialogTitle>
-          <DialogDescription>
+          </h2>
+          <p className="text-muted-foreground">
             {mode === "create" 
               ? "Remplissez les informations pour créer un nouvel article."
-              : "Modifiez les informations de l'article."
-            }
-          </DialogDescription>
-        </DialogHeader>
+              : "Modifiez les informations de l'article."}
+          </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -231,9 +239,11 @@ export function ArticleForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="1">Shoes</SelectItem>
-                        <SelectItem value="2">Electronics</SelectItem>
-                        <SelectItem value="3">Clothing</SelectItem>
+                        {categories.map((categorie: Categorie) => (
+                          <SelectItem key={categorie.id} value={categorie.id.toString()}>
+                            {categorie.designation} - {categorie.entreprise?.nomEntreprise}
+                          </SelectItem> 
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -305,10 +315,11 @@ export function ArticleForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="image-input" className="block text-sm font-medium mb-2">
                 Image (optionnel)
               </label>
               <Input
+                id="image-input"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
@@ -327,12 +338,12 @@ export function ArticleForm({
                 type="submit" 
                 disabled={createArticle.isPending || updateArticle.isPending}
               >
-                {createArticle.isPending || updateArticle.isPending
-                  ? "En cours..."
-                  : mode === "create"
-                  ? "Créer"
-                  : "Modifier"
-                }
+                {(() => {
+                  if (createArticle.isPending || updateArticle.isPending) {
+                    return "En cours..."
+                  }
+                  return mode === "create" ? "Créer" : "Modifier"
+                })()}
               </Button>
             </DialogFooter>
           </form>

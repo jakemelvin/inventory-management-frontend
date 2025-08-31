@@ -4,17 +4,14 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Upload, X } from "lucide-react"
+import { Upload, X, Eye, EyeOff } from "lucide-react"
 import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -111,6 +108,7 @@ export function UtilisateurForm({
 }: UtilisateurFormProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const createUtilisateur = useCreateUtilisateur()
   const updateUtilisateur = useUpdateUtilisateur()
@@ -215,16 +213,16 @@ export function UtilisateurForm({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] w-full lg:max-w-4xl xl:max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle>
+        <div className="flex-shrink-0 mb-6">
+          <h2 className="text-2xl font-bold tracking-tight">
             {mode === "create" ? "Nouvel Utilisateur" : "Modifier l'Utilisateur"}
-          </DialogTitle>
-          <DialogDescription>
+          </h2>
+          <p className="text-muted-foreground">
             {mode === "create"
               ? "Créez un nouvel utilisateur avec ses informations personnelles."
               : "Modifiez les informations de l'utilisateur."}
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
 
         <div className="flex-1 overflow-y-auto">
           <Form {...form}>
@@ -320,7 +318,26 @@ export function UtilisateurForm({
                     <FormItem>
                       <FormLabel>Mot de passe</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <div className="relative">
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="••••••••" 
+                            {...field} 
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
